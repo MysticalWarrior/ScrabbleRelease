@@ -1,4 +1,8 @@
-﻿using System;
+﻿/// Aidan McClung
+/// May 15, 2020
+/// A way to sort through words and output any that can be played with scrabble letters.
+/// 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
