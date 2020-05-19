@@ -1,5 +1,5 @@
 # ScrabbleRelease
-Release Version 2 (added points)
+Release Version 3 (Sorts alphabetically and by points.)
 
 The list of words orginally used:
 http://darcy.rsgc.on.ca/ACES/ICS4U/SourceCode/Words.txt
