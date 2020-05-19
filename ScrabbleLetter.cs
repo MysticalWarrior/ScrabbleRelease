@@ -139,5 +139,10 @@ namespace ScrabbleRelease
             ScrabbleLetter s = new ScrabbleLetter(L);
             return s.NumberOfLetters;
         }
+        public static int HowManyPoints(char L)
+        {
+            ScrabbleLetter s = new ScrabbleLetter(L);
+            return s.Points;
+        }
     }
 }

@@ -47,20 +47,23 @@ namespace ScrabbleRelease
             }
         }
         private ScrabbleGame sg;
+        private ScrabbleSorting ss;
         public string[] validWords;
         public List<String> wordsOutput;
+        public List<int> wordsPoints;
         public Point outputCapacity;
         public int nextToDisplay;
 
         public MainWindow()
         {
             InitializeComponent();
-            outputCapacity = new Point(11, 22);//The x and y of point are vertical and horizontal capacity.
+            outputCapacity = new Point(9, 20);//The x and y of point are vertical and horizontal capacity.
             playerHand = new char[7];
 
             ///Sets the dictionary of valid words
             validWords = pullWordsFromWeb();
-
+            ss = new ScrabbleSorting(validWords);
+            
             ///Starts program with Tiles (and triggers an update by setting it here)
             cbInputMode.SelectedItem = cbTiles;
         }
@@ -94,25 +97,27 @@ namespace ScrabbleRelease
         /// </summary>
         /// <param name="wordtocheck"></param>
         /// <returns> Returns true if the word can be played with the current tiles.</returns>
-        private bool checkWord(string wordtocheck)
+        private int checkWord(string wordtocheck)
         {
             string word = wordtocheck.ToUpper();///ensures playerhand and the word's cases match.
             int numberRemovedByWild = 0;
+            int points = 0;
             for (int i = 0; i < 7; i++)
             {
                 if (word.Length == 0) { break; }
                 else if (word.Contains(playerHand[i]))
                 {
                     word = word.Remove(word.IndexOf(playerHand[i]), 1);
+                    points += ScrabbleLetter.HowManyPoints(playerHand[i]);
                 }
                 else if (playerHand[i] == ' ')
                 {
                     numberRemovedByWild++;
                 }
             }
-            if (word == "") { return true; }
-            else if (word.Length <= numberRemovedByWild) { return true; }
-            else { return false; }
+            if (word == "") { return points; }
+            else if (word.Length <= numberRemovedByWild) { return points; }
+            else { return 0; }
         }
 
         /// <summary>
@@ -146,16 +151,21 @@ namespace ScrabbleRelease
         {
             //resets the list of checked words
             wordsOutput = new List<string>();
+            wordsPoints = new List<int>();
+
             nextToDisplay = 0;
             //then adds any word that can be played.
             for (int i = 0; i < validWords.Length; i++)
             {
-                if (checkWord(validWords[i]))
+                int temp = checkWord(validWords[i]);
+                if (temp > 0)
                 {
                     wordsOutput.Add(validWords[i]);
+                    wordsPoints.Add(temp);
                 }
             }
-
+            //resets the sorting mode to the default
+            cbSortBy.SelectedIndex = 0;
             displayWords();
             displayDiagnostics((bool)chkHideDiagnostics.IsChecked);
         }
@@ -167,12 +177,12 @@ namespace ScrabbleRelease
         /// <param name="hidden">A boolean representing visibility state (true = hidden)</param>
         private void displayDiagnostics(bool hidden)
         {
-            lblOutput.Content = wordsOutput.Count + " playable words  ";
-            lblOutput.Content += "Can show " + (outputCapacity.Y * outputCapacity.X) + " items (" + outputCapacity.Y + " rows and " + outputCapacity.X + " columns)  ";
-            lblOutput.Content += "Time to run: " + (DateTime.Now - timerStart).TotalMilliseconds + " ms";//the timer starts in the playerHand.get() method.
+            lblDiagnostics.Content = wordsOutput.Count + " playable words  ";
+            lblDiagnostics.Content += "Can show " + (outputCapacity.Y * outputCapacity.X) + " items (" + outputCapacity.Y + " rows and " + outputCapacity.X + " columns)  ";
+            lblDiagnostics.Content += "Time to run: " + (DateTime.Now - timerStart).TotalMilliseconds + " ms";//the timer starts in the playerHand.get() method.
 
-            if (hidden) { lblOutput.Visibility = Visibility.Collapsed; }
-            else { lblOutput.Visibility = Visibility.Visible; }
+            if (hidden) { lblDiagnostics.Visibility = Visibility.Collapsed; }
+            else { lblDiagnostics.Visibility = Visibility.Visible; }
         }
 
         /// <summary>
@@ -221,7 +231,7 @@ namespace ScrabbleRelease
                 {
                     if (nextToDisplay < wordsOutput.Count)
                     {
-                        wordsOut += wordsOutput[nextToDisplay] + '\r';
+                        wordsOut += wordsOutput[nextToDisplay] + '\t' + wordsPoints[nextToDisplay] + '\r';
                         nextToDisplay++;
                     }
                 }
@@ -243,7 +253,7 @@ namespace ScrabbleRelease
         /// <returns>A label containing the output.</returns>
         private Label createColumn(int i, string wordsOut)
         {
-            return new Label { Content = wordsOut, Name = "lblWordsOutput" + i.ToString(), Width = 60 };
+            return new Label { Content = wordsOut, Name = "lblWordsOutput" + i.ToString(), Width = 73 };
         }
 
         private void btnPrev_Click(object sender, RoutedEventArgs e)
@@ -297,7 +307,58 @@ namespace ScrabbleRelease
         /// </summary>
         private void chkHideDiagnostics_Checked(object sender, RoutedEventArgs e)
         {
-            lblOutput.Visibility = Visibility.Collapsed;
+            lblDiagnostics.Visibility = Visibility.Collapsed;
+        }
+
+        /// <summary>
+        /// Sorts the ouput words list when the selection changes to the corresponding method.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbSortBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //Note: Tried to put a catch system here so this code doesn't run and update the display a second time when a new input is entered ,but that broke it and it works fine so I'm leaving only this note to show that it's the right thing to do.
+            if (wordsOutput == null) { return; }
+            /*if (cbSortBy.SelectedItem == cbAlpha)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByAlpha(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }
+            if (cbSortBy.SelectedItem == cbAlphaInv)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByAlphaInv(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }*/
+            if (cbSortBy.SelectedItem == cbPoints)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByPoints(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }
+            if (cbSortBy.SelectedItem == cbPointsInv)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByPointsInv(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }
         }
     }
 }
