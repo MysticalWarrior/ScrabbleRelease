@@ -21,11 +21,14 @@
             <StackPanel x:Name="spTiles" Orientation="Horizontal" ToolTip="Tiles drawn by ScrabbleGame"/>
             <Button x:Name="btnNextTiles" Click="btnNextTiles_Click" Content="Next Set of Tiles"/>
             <ComboBox x:Name="cbSortBy" SelectionChanged="cbSortBy_SelectionChanged" SelectedIndex="0">
-                <ComboBoxItem Content="Change Sorting to Points"/>
-                <!--<ComboBoxItem x:Name="cbAlpha" Content="Sort Alphabetically (A - Z)"/>
-                <ComboBoxItem x:Name="cbAlphaInv" Content="Sort Alphabetically (Z - A)"/>-->
+                <!--<ComboBoxItem Content="Change Sorting to Points"/> A temporary Chooseitem item that didn't do anything for when Alpha wasn't working.-->
+                <ComboBoxItem x:Name="cbAlpha" Content="Sort Alphabetically (A - Z)"/>
+                <ComboBoxItem x:Name="cbAlphaInv" Content="Sort Alphabetically (Z - A)"/>
                 <ComboBoxItem x:Name="cbPoints" Content="Sort by Points (High - Low)"/>
                 <ComboBoxItem x:Name="cbPointsInv" Content="Sort by Points (Low - High)"/>
+                <!--<ComboBoxItem x:Name="cbLength" Content="Sort by Word Length (Low - High)"/>
+                <ComboBoxItem x:Name="cbLength2" Content="Sort by Word Length (2, 1, 3-7)" ToolTip="Shows 2 letter words first."/>
+                <ComboBoxItem x:Name="cbLengthInv" Content="Sort by Word Length (High - Low)"/>-->
             </ComboBox>
         </Menu>
         <DockPanel x:Name="spHeader" Height="25" DockPanel.Dock="Top" ToolTip="Please note this info applies for searching and creation of the output, but not for it's sorting.">

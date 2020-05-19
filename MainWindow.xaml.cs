@@ -164,9 +164,10 @@ namespace ScrabbleRelease
                     wordsPoints.Add(temp);
                 }
             }
-            //resets the sorting mode to the default
-            cbSortBy.SelectedIndex = 0;
-            displayWords();
+            //resets the sorting mode to the default. In order to make sure it refreshs we set it to null and then back to AZ.
+            int prevSortMode = cbSortBy.SelectedIndex;
+            cbSortBy.SelectedIndex = -1;
+            cbSortBy.SelectedIndex = prevSortMode;
             displayDiagnostics((bool)chkHideDiagnostics.IsChecked);
         }
 
@@ -246,7 +247,7 @@ namespace ScrabbleRelease
         }
 
         /// <summary>
-        /// 
+        /// Creates a column for use in adding to the horizontal collection.
         /// </summary>
         /// <param name="i">The horizontal index of this column</param>
         /// <param name="wordsOut">A '\r' seperated string of the words the column is to display.</param>
@@ -313,13 +314,12 @@ namespace ScrabbleRelease
         /// <summary>
         /// Sorts the ouput words list when the selection changes to the corresponding method.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void cbSortBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Note: Tried to put a catch system here so this code doesn't run and update the display a second time when a new input is entered ,but that broke it and it works fine so I'm leaving only this note to show that it's the right thing to do.
+            //All displayWords() are triggered through this method. other methods trigger a display update by setting the selection to -1 than back to what it was.
+            //Okay well sort of... the Next and Prev buttons still can just update but because they don't change the order of the words, just the section that's being displayed.
             if (wordsOutput == null) { return; }
-            /*if (cbSortBy.SelectedItem == cbAlpha)
+            if (cbSortBy.SelectedItem == cbAlpha)
             {
                 Tuple<List<string>, List<int>> temp = ss.SortByAlpha(wordsOutput, wordsPoints);
                 wordsOutput = temp.Item1;
@@ -338,7 +338,7 @@ namespace ScrabbleRelease
                 //update words with the newly sorted ones.
                 nextToDisplay = 0;
                 displayWords();
-            }*/
+            }
             if (cbSortBy.SelectedItem == cbPoints)
             {
                 Tuple<List<string>, List<int>> temp = ss.SortByPoints(wordsOutput, wordsPoints);
@@ -359,6 +359,37 @@ namespace ScrabbleRelease
                 nextToDisplay = 0;
                 displayWords();
             }
+            /*
+            if (cbSortBy.SelectedItem == cbLength)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByPointsInv(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }
+            if (cbSortBy.SelectedItem == cbLength2)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByPointsInv(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }
+            if (cbSortBy.SelectedItem == cbLengthInv)
+            {
+                Tuple<List<string>, List<int>> temp = ss.SortByPointsInv(wordsOutput, wordsPoints);
+                wordsOutput = temp.Item1;
+                wordsPoints = temp.Item2;
+
+                //update words with the newly sorted ones.
+                nextToDisplay = 0;
+                displayWords();
+            }*/
         }
     }
 }
